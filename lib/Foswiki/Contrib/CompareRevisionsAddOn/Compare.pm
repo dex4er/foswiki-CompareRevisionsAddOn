@@ -239,6 +239,10 @@ sub compare {
         # Do the replacement of %TEXT1% and %TEXT2% simultaneously
         # to prevent difficulties with text containing '%TEXT2%'
         $tmpl =~ s/%TEXT(1|2)%/$1==1?$text1:$text2/ge;
+
+        my $charset = $Foswiki::cfg{Site}{CharSet} || 'iso-8859-1';
+        $tmpl = Encode::encode( $charset, $tmpl );
+
         $output .= $tmpl;
 
     }
@@ -291,10 +295,6 @@ sub compare {
       ;    # remove <nop> and <noautolink> tags
 
     $output .= $tmpl_after;
-
-    # Item12337: part of alternative fix for Item11755
-    my $charset = $Foswiki::cfg{Site}{CharSet} || 'iso-8859-1';
-    $output = Encode::encode( $charset, $output );
 
     # Break circular references to avoid memory leaks. (Tasks:9127)
     $tree1 = $tree1->parent() while defined $tree1->parent();
